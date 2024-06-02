@@ -1,18 +1,18 @@
 import React, { useState } from 'react';
-import { View, TextInput, Button, StyleSheet, Text } from 'react-native';
 import { useRouter  } from 'expo-router';
+import { View, TextInput, Button, StyleSheet, Text } from 'react-native';
 import axios from 'axios';
 
 
-const LoginScreen = () => {
+const RegisterScreen = () => {
     const router = useRouter();
-    const [email, setEmail] = useState('');
+    const [username, setUserName] = useState('');
     const [password, setPassword] = useState('');
 
-    const handleLogin = async () => {
+    const handleRegister = async () => {
         try {
-            const res = await axios.post('http://localhost:5000/api/auth/login', { email, password });
-            // Navegar para a próxima tela
+            await axios.post('http://192.168.1.108:3000/users', { username, password });
+            //navigation.navigate('index');
         } catch (err) {
             console.error(err);
         }
@@ -20,12 +20,12 @@ const LoginScreen = () => {
 
     return (
         <View style={styles.container}>
-            <Text>Email:</Text>
-            <TextInput style={styles.input} value={email} onChangeText={setEmail} />
+            <Text>Nome de usário:</Text>
+            <TextInput style={styles.input} value={username} onChangeText={setUserName} />
             <Text>Senha:</Text>
             <TextInput style={styles.input} value={password} onChangeText={setPassword} secureTextEntry />
-            <Button title="Login" onPress={handleLogin} />
-            <Button title="Registrar" onPress={() => router.push('/register')} />
+            <Button title="Registrar" onPress={handleRegister} />
+            <Button title="Voltar para login" onPress={() => router.push('/')} />
         </View>
     );
 };
@@ -45,4 +45,4 @@ const styles = StyleSheet.create({
     }
 });
 
-export default LoginScreen;
+export default RegisterScreen;
