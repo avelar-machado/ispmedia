@@ -7,7 +7,6 @@ import {
   StyleSheet,
   Text,
   SafeAreaView,
-  GestureResponderEvent,
 } from "react-native";
 import axios from "axios";
 
@@ -17,47 +16,58 @@ const RegisterScreen = () => {
   const router = useRouter();
   const [username, setUserName] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
 
   const handleRegister = async () => {
+    if (!username || !password) {
+      setError("Nome de usuário e Senha são requisitados.");
+      return;
+    }
+
     try {
-      await axios.post("http://192.168.100.6:3000/users", {
-        username,
-        password,
-      });
-      //navigation.navigate('index');
+      const response = await axios.post('http://192.168.1.108:3000/users', { username, password });
+      console.log(response.data);
+      // navigation.navigate('index'); // descomente se estiver usando o react-navigation
+      setError(""); // Limpa qualquer erro anterior após o sucesso
+      alert ("Registo ao ISPMEDIA feito com Sucesso.");
+      router.push("/");
     } catch (err) {
-      console.error(err);
+      setError("Erro ao Registar. Tente novamente.");
     }
   };
 
-  function handleLogin(event: GestureResponderEvent): void {
-    throw new Error("Function not implemented.");
-  }
-
   return (
     <SafeAreaView style={styles.container}>
-      <Text style={styles.text}>Nome de usário:</Text>
-      <TextInput
-        style={styles.input}
-        value={username}
-        onChangeText={setUserName}
-      />
-      <Text style={styles.text}>Senha:</Text>
-      <TextInput
-        style={styles.input}
-        value={password}
-        onChangeText={setPassword}
-        secureTextEntry
-      />
+      <Text style={styles.logoText}>Crie uma conta no ISPMEDIA</Text>
+      <View style={styles.inputs}>
+        <Text style={styles.text}>Nome de usuário:</Text>
+        <TextInput
+            style={styles.input}
+            value={username}
+            placeholder="Escreva o seu nome de usuário aqui..."
+            placeholderTextColor={"black"}
+            onChangeText={setUserName}
+        />
+        <Text style={styles.text}>Senha:</Text>
+        <TextInput
+            style={styles.input}
+            value={password}
+            placeholder="Escreva a sua senha aqui..."
+            placeholderTextColor={"black"}
+            onChangeText={setPassword}
+            secureTextEntry
+        />
+        {error ? <Text style={styles.error}>{error}</Text> : null}
+      </View>
       <View style={styles.buttonContainer}>
-        <View style={styles.button}>
-          <Button title="Login" onPress={handleLogin} color={"#000000"} />
+        <View style={[styles.button, {backgroundColor: "#80ed99"}]}>
+          <Button title="Registrar" onPress={handleRegister} color={"#000000"} />
         </View>
         <Separator />
         <View style={styles.button}>
           <Button
-            title="Registrar"
-            onPress={() => router.push("/register")}
+            title="Entrar"
+            onPress={() => router.push("/")}
             color={"#000000"}
           />
         </View>
@@ -70,15 +80,16 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: "center",
-    padding: 20,
     backgroundColor: "#161515",
+  },
+  inputs: {
+    padding: 35,
   },
   input: {
     height: 40,
     borderColor: "gray",
     borderWidth: 1,
     marginBottom: 20,
-    paddingLeft: 10,
     backgroundColor: "white",
     borderRadius: 5,
   },
@@ -104,6 +115,18 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "condensed",
     fontFamily: "Monda-Regular",
+  },
+  logoText: {
+    color: "white",
+    fontSize: 30,
+    textAlign: "center",
+    marginBottom: 35,
+  },
+  error: {
+    color: "red",
+    marginBottom: 20,
+    fontSize: 16,
+    textAlign: "center",
   },
 });
 
