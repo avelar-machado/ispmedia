@@ -38,7 +38,7 @@ const VideoScreen = () => {
       ) : (
         <Video
           ref={videoRef}
-          source={{ uri }}
+          source={require('@/assets/videos/Coldplay.mp4')}
           rate={1.0}
           volume={1.0}
           isMuted={false}
