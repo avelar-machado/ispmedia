@@ -38,7 +38,7 @@ const VideoScreen = () => {
       ) : (
         <Video
           ref={videoRef}
-          source={require('@/assets/videos/Coldplay.mp4')}
+          source={{ uri: uri }}
           rate={1.0}
           volume={1.0}
           isMuted={false}
@@ -69,7 +69,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   video: {
-    width: '90%',
+    width: '100%',
     height: 300,
   },
   error: {

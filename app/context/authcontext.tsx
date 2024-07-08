@@ -17,12 +17,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const login = (token: string) => {
     setIsLoggedIn(true);
-    // Aqui você podemos armazenar o token em algum lugar seguro, como AsyncStorage
+    // Aqui podemos armazenar o token em algum lugar seguro, como AsyncStorage
   };
 
   const logout = () => {
     setIsLoggedIn(false);
-    // Aqui você podemos remover o token do armazenamento seguro
+    // Aqui podemos remover o token do armazenamento seguro
   };
 
   return (

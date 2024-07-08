@@ -29,7 +29,7 @@ const RegisterScreen = () => {
     }
 
     try {
-      const response = await axios.post('http://192.168.1.108:3000/users', { username, nome, email, password });
+      const response = await axios.post('http://192.168.1.109:3000/users', { username, nome, email, password });
       console.log(response.data);
       setError(""); // Limpa qualquer erro anterior após o sucesso
       alert("Registo ao ISPMEDIA feito com Sucesso.");
