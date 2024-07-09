@@ -12,6 +12,7 @@ const LoginScreen = () => {
   const router = useRouter();
   const { login } = useAuth();
   const [username, setUserName] = useState("");
+  let code: number;
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [focusedInput, setFocusedInput] = useState<string | null>(null);
@@ -28,9 +29,13 @@ const LoginScreen = () => {
         password,
       });
       login(res.data.token);
+      code = res.data.id;
       alert("Bem-vindo(a) ao ISPMEDIA " + res.data.username);
       setError(''); // Limpa qualquer erro anterior após o sucesso
-      router.push("/screens");
+      router.push({
+        pathname: '/screens',
+        params: { username, code },
+      });
     } catch (err) {
       setError("Erro ao fazer login. Tente novamente.");
     }

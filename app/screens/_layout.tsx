@@ -5,9 +5,11 @@ import CustomHeader from '@/components/CustomHeader';
 import { TabBarIcon } from '@/components/navigation/TabBarIcon';
 import { Colors } from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
+import { useLocalSearchParams  } from 'expo-router';
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
+  const { username, code } = useLocalSearchParams(); 
 
   return (
     <Tabs
@@ -22,6 +24,7 @@ export default function TabLayout() {
     >
       <Tabs.Screen
         name="Home"
+        initialParams={{ username, code }}
         options={{
           title: 'Home',
           tabBarIcon: ({ color, focused }) => (
@@ -31,10 +34,31 @@ export default function TabLayout() {
       />
       <Tabs.Screen
         name="Artistas"
+        initialParams={{ username, code }}
         options={{
           title: 'Teus Artistas',
           tabBarIcon: ({ color, focused }) => (
             <TabBarIcon name={focused ? 'people' : 'people-outline'} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="Radios"
+        initialParams={{ username, code }}
+        options={{
+          title: 'Rádios',
+          tabBarIcon: ({ color, focused }) => (
+            <TabBarIcon name={focused ? 'radio' : 'radio-outline'} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="Pesquisa"
+        initialParams={{ username, code }}
+        options={{
+          title: 'Pesquisa',
+          tabBarIcon: ({ color, focused }) => (
+            <TabBarIcon name={focused ? 'search' : 'search-outline'} color={color} />
           ),
         }}
       />

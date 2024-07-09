@@ -3,7 +3,7 @@ import axios from 'axios';
 import { View, Text, FlatList, TouchableOpacity, Modal, TextInput, Button, StyleSheet, Image, Platform } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import * as ImagePicker from 'expo-image-picker';
-import { Link } from 'expo-router';
+import { Link, useLocalSearchParams  } from 'expo-router';
 import * as FileSystem from 'expo-file-system';
 
 interface Artist {
@@ -27,6 +27,7 @@ export default function Artist() {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [newArtist, setNewArtist] = useState<Omit<Artist, 'id' | 'imageId'>>({ nome: '' });
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const { username, code } = useLocalSearchParams(); 
 
   useEffect(() => {
     fetchArtistas();
@@ -66,7 +67,7 @@ export default function Artist() {
           if (mimeMatch && base64) {
             const mime = mimeMatch[1];
             const extension = mime.split("/")[1];
-            filename = "ispmedia."+extension;
+            filename = newArtist.nome + '.',+extension;
             type = mime;
   
             // Convert base64 to byte array
@@ -87,11 +88,11 @@ export default function Artist() {
             const formData = new FormData();
             formData.append('image', {
               uri: fileUri,
-              name: 'image.jpeg',
+              name: newArtist.nome + '.jpeg',
               type: 'image/jpeg',
             } as any);
 
-            const uploadResponse = await axios.post('http://192.168.1.109:3000/api/upload/image/avelarmanuel', formData, {
+            const uploadResponse = await axios.post(`http://192.168.1.109:3000/api/upload/image/${username}`, formData, {
               headers: {
                 'Content-Type': 'multipart/form-data',
               },
@@ -100,7 +101,7 @@ export default function Artist() {
             if (uploadResponse.status === 200) {
               const data = uploadResponse.data;
               const imagem_ = {
-                user_Id: 1,
+                user_Id: code,
                 url: data.path,
                 descricao: '',
                 nome_ficheiro: data.filename,
@@ -151,7 +152,7 @@ export default function Artist() {
           const formData = new FormData();
           formData.append('image', blob, filename);
   
-          const uploadResponse = await axios.post(`http://192.168.1.109:3000/api/upload/image/avelarmanuel`, formData, {
+          const uploadResponse = await axios.post(`http://192.168.1.109:3000/api/upload/image/${username}`, formData, {
             headers: {
               'Content-Type': 'multipart/form-data',
             },
@@ -160,7 +161,7 @@ export default function Artist() {
           if (uploadResponse.status === 200) {
             const data = uploadResponse.data;
             const imagem_ = {
-              user_Id: 1,
+              user_Id: code,
               url: data.path,
               descricao: '',
               nome_ficheiro: data.filename,
@@ -233,12 +234,12 @@ export default function Artist() {
         data={artistas}
         keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => (
-          <Link href={{ pathname: '/album' }}>
+          <Link href={{ pathname: '/album', params: { username, code, idArtist : item.id, nameArtist : item.nome } }}>
             <View style={styles.artistContainer}>
               <Image
                 source={{
                   uri: images.find(img => img.id === item.imageId) 
-                    ? `http://192.168.1.109:3000/api/upload/image/avelarmanuel/${images.find(img => img.id === item.imageId)?.nome_ficheiro}`
+                    ? `http://192.168.1.109:3000/api/upload/image/${username}/${images.find(img => img.id === item.imageId)?.nome_ficheiro}`
                     : `http://192.168.1.109:3000/api/upload/image/avelarmanuel/1719273293937-img1.jpg`
                 }}
                 style={styles.image}

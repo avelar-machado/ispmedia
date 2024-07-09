@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect, createRef } from 'react';
-import { ScrollView, View, Text, TouchableOpacity, Modal, TextInput, FlatList, StyleSheet, Platform, Button } from 'react-native';
-import { Video, ResizeMode } from 'expo-av';
+import { ScrollView, View, Text, TouchableOpacity, Modal, TextInput, StyleSheet, Platform, Button } from 'react-native';
+import { Audio, Video, ResizeMode } from 'expo-av';
 import { FontAwesome } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import Slider from '@react-native-community/slider';
@@ -33,6 +33,7 @@ interface AudioType {
 }
 
 export default function Media() {
+    const audioRef = [React.useRef(new Audio.Sound()), React.useRef(new Audio.Sound()), React.useRef(new Audio.Sound())];
   const [videos, setVideos] = useState<VideoType[]>([]);
   const [musicas, setMusicas] = useState<AudioType[]>([]);
   const [isVideoModalVisible, setIsVideoModalVisible] = useState(false);
@@ -101,53 +102,97 @@ export default function Media() {
   const addVideo = async () => {
     try {
       if (selectedVideo) {
-        const fileUri = selectedVideo;
 
-        const fileInfo = await FileSystem.getInfoAsync(fileUri);
-        if (fileInfo.exists) {
-          const formData = new FormData();
-          formData.append('video', {
-            uri: fileUri,
-            name: 'video.mp4',
-            type: 'video/mp4',
-          } as any);
+        if (Platform.OS !== 'web') {
+            const fileUri = selectedVideo;
+            const fileInfo = await FileSystem.getInfoAsync(fileUri);
+            if (fileInfo.exists) {
+                const formData = new FormData();
+                formData.append('video', {
+                    uri: fileUri,
+                    name: 'video.mp4',
+                    type: 'video/mp4',
+                } as any);
 
-          const uploadResponse = await axios.post('http://192.168.1.109:3000/api/upload/video/avelarmanuel', formData, {
-            headers: {
-              'Content-Type': 'multipart/form-data',
-            },
-          });
+                const uploadResponse = await axios.post('http://192.168.1.109:3000/api/upload/video/avelarmanuel', formData, {
+                    headers: {
+                    'Content-Type': 'multipart/form-data',
+                    },
+                });
 
-          if (uploadResponse.data) {
-            const data = uploadResponse.data;
+                if (uploadResponse.data) {
+                    const data = uploadResponse.data;
 
-            const video_ = {
-              user_Id: 1,
-              albumId: 1,
-              url: data.path,
-              descricao: newVideo.descricao,
-              nome_ficheiro: data.filename,
-              extensao: data.mimetype,
-            };
+                    const video_ = {
+                    user_Id: 1,
+                    albumId: 1,
+                    url: data.path,
+                    descricao: newVideo.descricao,
+                    nome_ficheiro: data.filename,
+                    extensao: data.mimetype,
+                    };
 
-            await axios.post('http://192.168.1.109:3000/videos', video_, {
-              headers: {
-                'Content-Type': 'application/json',
-              },
-            });
+                    await axios.post('http://192.168.1.109:3000/videos', video_, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    });
 
-            alert('Vídeo adicionado com sucesso!');
-            setNewVideo({ user_Id: 1, albumId: 1, url: '', descricao: '', nome_ficheiro: '', extensao: '' });
-            setSelectedVideo(null);
-            setIsVideoModalVisible(false);
-            fetchVideos();
-          } else {
-            console.error('Upload failed');
-          }
+                    alert('Vídeo adicionado com sucesso!');
+                    setNewVideo({ user_Id: 1, albumId: 1, url: '', descricao: '', nome_ficheiro: '', extensao: '' });
+                    setSelectedVideo(null);
+                    setIsVideoModalVisible(false);
+                    fetchVideos();
+                } else {
+                    console.error('Upload failed');
+                }
+            } else {
+                alert ("Aqui");
+                console.error('File does not exist');
+            }
         } else {
-          console.error('File does not exist');
+            const response = await fetch(selectedVideo);
+            const blob = await response.blob();
+            const formData = new FormData();
+            formData.append('video', blob, newVideo.descricao+'.mp4');
+    
+            const uploadResponse = await axios.post('http://192.168.1.109:3000/api/upload/video/avelarmanuel', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
+           
+            
+            if (uploadResponse.data) {
+                const data = uploadResponse.data;
+    
+                const video_ = {
+                  user_Id: 1,
+                  albumId: 1,
+                  url: data.path,
+                  descricao: newVideo.descricao,
+                  nome_ficheiro: data.filename,
+                  extensao: data.mimetype,
+                };
+    
+                await axios.post('http://192.168.1.109:3000/videos', video_, {
+                  headers: {
+                    'Content-Type': 'application/json',
+                  },
+                });
+    
+                alert('Vídeo adicionado com sucesso!');
+                setNewVideo({ user_Id: 1, albumId: 1, url: '', descricao: '', nome_ficheiro: '', extensao: '' });
+                setSelectedVideo(null);
+                setIsVideoModalVisible(false);
+                fetchVideos();
+            } else {
+                console.error('Upload failed');
+            }
         }
+
       }
+        
     } catch (error) {
       console.error('Error uploading video:', error);
     }
@@ -156,78 +201,141 @@ export default function Media() {
   const addMusic = async () => {
     try {
       if (selectedMusic) {
-        const fileUri = selectedMusic;
-        const fileInfo = await FileSystem.getInfoAsync(fileUri);
-        if (fileInfo.exists) {
-          const formData = new FormData();
-          formData.append('music', {
-            uri: fileUri,
-            name: 'music.mp3',
-            type: 'music/mp3',
-          } as any);
-          
-          const uploadResponse = await axios.post('http://192.168.1.109:3000/api/upload/music/avelarmanuel', formData, {
-            headers: {
-              'Content-Type': 'multipart/form-data',
-            },
-          });
+        alert ("Fuiiii");
 
-
-          if (uploadResponse.data) {
-            const data = uploadResponse.data;
-            if (data && data.path && data.filename && data.mimetype) {
-              const music_ = {
-                titulo: newMusic.titulo,
-                generoId: 1,
-                artistaId: 1,
-                albumId: 1,
-                imageId: 13,
-                url: data.path,
-                userId: 1,
-                nome_ficheiro: data.filename,
-                extensao: data.mimetype,
-                "estado": true,
-              };
-
-              const musicInsertResponse = await axios.post('http://192.168.1.109:3000/musics', music_, {
+        if (Platform.OS !== 'web') {
+            const fileUri = selectedMusic;
+            const fileInfo = await FileSystem.getInfoAsync(fileUri);
+            if (fileInfo.exists) {
+            const formData = new FormData();
+            formData.append('music', {
+                uri: fileUri,
+                name: 'music.mp3',
+                type: 'music/mp3',
+            } as any);
+            
+            const uploadResponse = await axios.post('http://192.168.1.109:3000/api/upload/music/avelarmanuel', formData, {
                 headers: {
-                  'Content-Type': 'application/json',
+                'Content-Type': 'multipart/form-data',
                 },
-              });
-
-              alert("Aqui vamos");
-
-              if (musicInsertResponse.data) {
-                alert('Música adicionada com sucesso!');
-                setNewMusic({
-                    titulo: '',
-                    generoID: 1,
-                    artistId: 1,
+            });
+            
+            if (uploadResponse.data) {
+                const data = uploadResponse.data;
+                if (data && data.path && data.filename && data.mimetype) {
+                const music_ = {
+                    titulo: newMusic.titulo,
+                    generoId: 1,
+                    artistaId: 1,
                     albumId: 1,
-                    imageId: 1,
-                    url: '',
+                    imageId: 13,
+                    url: data.path,
                     userId: 1,
-                    nome_ficheiro: '',
-                    extensao: '',
+                    nome_ficheiro: data.filename,
+                    extensao: data.mimetype,
+                    "estado": true,
+                };
+
+                const musicInsertResponse = await axios.post('http://192.168.1.109:3000/musics', music_, {
+                    headers: {
+                    'Content-Type': 'application/json',
+                    },
                 });
-                setSelectedMusic(null);
-                setIsMusicModalVisible(false);
-                fetchMusicas();
-              } else {
-                console.error('Failed to add music to database:', musicInsertResponse);
-                alert('Ocorreu um erro ao adicionar a música ao banco de dados. Verifique a conexão ou tente novamente mais tarde.');
-              }
+
+                if (musicInsertResponse.data) {
+                    alert('Música adicionada com sucesso!');
+                    setNewMusic({
+                        titulo: '',
+                        generoID: 1,
+                        artistId: 1,
+                        albumId: 1,
+                        imageId: 1,
+                        url: '',
+                        userId: 1,
+                        nome_ficheiro: '',
+                        extensao: '',
+                    });
+                    setSelectedMusic(null);
+                    setIsMusicModalVisible(false);
+                    fetchMusicas();
+                } else {
+                    console.error('Failed to add music to database:', musicInsertResponse);
+                    alert('Ocorreu um erro ao adicionar a música ao banco de dados. Verifique a conexão ou tente novamente mais tarde.');
+                }
+                } else {
+                console.error('Invalid upload response data:', data);
+                alert('Ocorreu um erro no upload da música. Verifique a conexão ou tente novamente mais tarde.');
+                }
             } else {
-              console.error('Invalid upload response data:', data);
-              alert('Ocorreu um erro no upload da música. Verifique a conexão ou tente novamente mais tarde.');
+                console.error('Upload failed with status:', uploadResponse.status);
+                alert('Ocorreu um erro ao fazer o upload da música. Verifique a conexão ou tente novamente mais tarde.');
             }
-          } else {
-            console.error('Upload failed with status:', uploadResponse.status);
-            alert('Ocorreu um erro ao fazer o upload da música. Verifique a conexão ou tente novamente mais tarde.');
-          }
+            } else {
+            console.error('File does not exist');
+            alert('O arquivo de música selecionado não existe. Por favor, tente selecionar outro arquivo.');
+            }
         } else {
-          console.error('File does not exist');
-          alert('O arquivo de música selecionado não existe. Por favor, tente selecionar outro arquivo.');
+            const response = await fetch(selectedMusic);
+            const blob = await response.blob();
+            const formData = new FormData();
+            formData.append('music', blob, newMusic.titulo+'.mp4');
+    
+            const uploadResponse = await axios.post('http://192.168.1.109:3000/api/upload/music/avelarmanuel', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
+            
+            if (uploadResponse.data) {
+                const data = uploadResponse.data;
+                if (data && data.path && data.filename && data.mimetype) {
+                const music_ = {
+                    titulo: newMusic.titulo,
+                    generoId: 1,
+                    artistaId: 1,
+                    albumId: 1,
+                    imageId: 13,
+                    url: data.path,
+                    userId: 1,
+                    nome_ficheiro: data.filename,
+                    extensao: data.mimetype,
+                    "estado": true,
+                };
+
+                const musicInsertResponse = await axios.post('http://192.168.1.109:3000/musics', music_, {
+                    headers: {
+                    'Content-Type': 'application/json',
+                    },
+                });
+
+                if (musicInsertResponse.data) {
+                    alert('Música adicionada com sucesso!');
+                    setNewMusic({
+                        titulo: '',
+                        generoID: 1,
+                        artistId: 1,
+                        albumId: 1,
+                        imageId: 1,
+                        url: '',
+                        userId: 1,
+                        nome_ficheiro: '',
+                        extensao: '',
+                    });
+                    setSelectedMusic(null);
+                    setIsMusicModalVisible(false);
+                    fetchMusicas();
+                } else {
+                    console.error('Failed to add music to database:', musicInsertResponse);
+                    alert('Ocorreu um erro ao adicionar a música ao banco de dados. Verifique a conexão ou tente novamente mais tarde.');
+                }
+                } else {
+                console.error('Invalid upload response data:', data);
+                alert('Ocorreu um erro no upload da música. Verifique a conexão ou tente novamente mais tarde.');
+                }
+            } else {
+                console.error('Upload failed with status:', uploadResponse.status);
+                alert('Ocorreu um erro ao fazer o upload da música. Verifique a conexão ou tente novamente mais tarde.');
+            }
         }
       }
     } catch (error) {
@@ -268,8 +376,50 @@ export default function Media() {
     }
   };
 
-  const seekAudio = (index: number, value: number) => {};
-  const playPauseAudio = (index: number, uri: string) => {};
+  const loadAndPlaySound = async (index: number, uri: string) => {
+    const soundObject = audioRef[index].current;
+    try {
+      await soundObject.unloadAsync(); // Unload any previous sound
+      await soundObject.loadAsync({ uri });
+      soundObject.setOnPlaybackStatusUpdate(status => updatePlaybackStatus(index, status));
+      await soundObject.playAsync();
+      setIsPlaying(prev => prev.map((play, i) => (i === index ? true : play)));
+    } catch (error) {
+      console.error('Error playing sound:', error);
+    }
+  };
+
+  const updatePlaybackStatus = (index: number, status: any) => {
+    if (status.isLoaded) {
+      setPosition(prev => prev.map((pos, i) => (i === index ? status.positionMillis : pos)));
+      setDuration(prev => prev.map((dur, i) => (i === index ? status.durationMillis : dur)));
+      if (status.didJustFinish) {
+        setIsPlaying(prev => prev.map((play, i) => (i === index ? false : play)));
+      }
+    }
+  };
+
+  const seekAudio = async (index: number, positionMillis: number) => {
+    const soundObject = audioRef[index].current;
+    await soundObject.setPositionAsync(positionMillis);
+  };
+
+  const playPauseAudio = async (index: number, uri: string) => {
+    const soundObject = audioRef[index].current;
+    const status = await soundObject.getStatusAsync();
+    if (status.isLoaded) {
+      if (status.isPlaying) {
+        await soundObject.pauseAsync();
+        setIsPlaying(prev => prev.map((play, i) => (i === index ? false : play)));
+      } else {
+        await soundObject.playAsync();
+        setIsPlaying(prev => prev.map((play, i) => (i === index ? true : play)));
+      }
+    } else {
+      loadAndPlaySound(index, uri);
+    }
+  };
+  
   const converterMilisegundosEmMinutos = (ms: number) => {
     const minutos = Math.floor(ms / 60000);
     const segundos = ((ms % 60000) / 1000).toFixed(0);
@@ -279,6 +429,7 @@ export default function Media() {
   return (
     <ScrollView contentContainerStyle={styles.scrollContainer}>
       <View style={styles.container}>
+      <Text style = {styles.head} >Vídeos e Músicas</Text>
         <View style={styles.buttonContainer}>
           <TouchableOpacity style={styles.button} onPress={() => setIsVideoModalVisible(true)}>
             <Text style={styles.buttonText}>Adicionar Vídeo</Text>
@@ -400,6 +551,12 @@ const styles = StyleSheet.create({
     padding: 20,
     backgroundColor: '#fff',
   },
+  head: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginTop: 20,
+    marginBottom: 30,
+  },
   buttonContainer: {
     flexDirection: 'row',
     justifyContent: 'space-around',
@@ -421,6 +578,7 @@ const styles = StyleSheet.create({
   },
   videoContainer: {
     marginBottom: 20,
+    alignItems: 'center',
   },
   video: {
     width: Platform.OS === 'web' ? 700 : '100%',

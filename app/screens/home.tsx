@@ -2,8 +2,9 @@ import * as React from 'react';
 import { View, StyleSheet, Text, ScrollView, Platform, Image, TouchableOpacity } from 'react-native';
 import { Audio, Video, ResizeMode } from 'expo-av';
 import { FontAwesome } from '@expo/vector-icons';
-import { Link } from 'expo-router';
+import { Link, useLocalSearchParams  } from 'expo-router';
 import Slider from '@react-native-community/slider';
+
 
 export default function App() {
   const audioRefs = [React.useRef(new Audio.Sound()), React.useRef(new Audio.Sound()), React.useRef(new Audio.Sound())];
@@ -12,6 +13,7 @@ export default function App() {
   const [isPlaying, setIsPlaying] = React.useState([false, false, false]);
   const [position, setPosition] = React.useState([0, 0, 0]);
   const [duration, setDuration] = React.useState([0, 0, 0]);
+  const { username, data } = useLocalSearchParams(); 
 
   const videos = [
     {

@@ -3,7 +3,7 @@ import axios from 'axios';
 import { View, Text, FlatList, TouchableOpacity, Modal, TextInput, Button, StyleSheet, Image } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import * as ImagePicker from 'expo-image-picker';
-import { Link } from 'expo-router';
+import { Link, useLocalSearchParams  } from 'expo-router';
 import * as FileSystem from 'expo-file-system';
 
 interface Album {
@@ -37,6 +37,7 @@ export default function Album() {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [newAlbum, setNewAlbum] = useState<Omit<Album, 'id' | 'imageFile'>>({ nome: '', artistaId: null, imageId: null });
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const { username, code, idArtist, nameArtist } = useLocalSearchParams(); 
 
   useEffect(() => {
     fetchAlbums();
@@ -75,7 +76,7 @@ export default function Album() {
           if (mimeMatch && base64) {
             const mime = mimeMatch[1];
             const extension = mime.split("/")[1];
-            filename = "ispmedia."+extension;
+            filename = newAlbum.nome + '.',+extension;
             type = mime;
 
             const byteCharacters = atob(base64);
@@ -94,11 +95,11 @@ export default function Album() {
             const formData = new FormData();
             formData.append('image', {
               uri: fileUri,
-              name: 'image.jpeg',
+              name: newAlbum.nome + '.jpeg',
               type: 'image/jpeg',
             } as any);
 
-            const insertImageResponse = await axios.post('http://192.168.1.109:3000/api/upload/image/avelarmanuel', formData, {
+            const insertImageResponse = await axios.post(`http://192.168.1.109:3000/api/upload/image/${username}`, formData, {
               headers: {
                 'Content-Type': 'multipart/form-data',
               },
@@ -108,7 +109,7 @@ export default function Album() {
               const imageData = insertImageResponse.data;
               const album_ = {
                 nome: newAlbum.nome,
-                artistaId: newAlbum.artistaId,
+                artistaId: idArtist,
                 imageId: imageData.id,
               };
 
@@ -139,7 +140,7 @@ export default function Album() {
           const formData = new FormData();
           formData.append('image', blob, filename);
 
-          const uploadResponse = await axios.post(`http://192.168.1.109:3000/api/upload/image/avelarmanuel`, formData, {
+          const uploadResponse = await axios.post(`http://192.168.1.109:3000/api/upload/image/${username}`, formData, {
             headers: {
               'Content-Type': 'multipart/form-data',
             },
@@ -148,9 +149,9 @@ export default function Album() {
           if (uploadResponse.status === 200) {
             const data = uploadResponse.data;
             const image_ = {
-              user_Id: 1,
+              user_Id: code,
               url: data.path,
-              descricao: '',
+              descricao: newAlbum.nome,
               nome_ficheiro: data.filename,
               extensao: data.mimetype,
             };
@@ -165,7 +166,7 @@ export default function Album() {
               const imageData = insertImageResponse.data;
               const album_ = {
                 nome: newAlbum.nome,
-                artistaId: newAlbum.artistaId,
+                artistaId: idArtist,
                 imageId: imageData.id,
               };
 
@@ -216,6 +217,7 @@ export default function Album() {
 
   return (
     <View style={styles.container}>
+      <Text style = {styles.head} >ALBUNS</Text>
       <FlatList
         data={albums}
         keyExtractor={(item) => item.id.toString()}
@@ -225,7 +227,7 @@ export default function Album() {
               <Image
                 source={{
                   uri: images.find(img => img.id === item.imageId)
-                    ? `http://192.168.1.109:3000/api/upload/image/avelarmanuel/${images.find(img => img.id === item.imageId)?.nome_ficheiro}`
+                    ? `http://192.168.1.109:3000/api/upload/image/${username}/${images.find(img => img.id === item.imageId)?.nome_ficheiro}`
                     : `http://192.168.1.109:3000/api/upload/image/avelarmanuel/1719310871715-ispmedia.jpeg`
                 }}
                 style={styles.image}
@@ -271,6 +273,11 @@ const styles = StyleSheet.create({
     padding: 20,
     marginTop: 30,
     backgroundColor: '#fff',
+  },
+  head: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginTop: 20,
   },
   albumContainer: {
     flexDirection: 'row',

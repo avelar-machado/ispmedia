@@ -37,7 +37,9 @@ export default function RootLayout() {
           <Stack.Screen name="screens" />
           <Stack.Screen name="video" />
           <Stack.Screen name="album" />
-          <Stack.Screen name="mediaLibrary" />          
+          <Stack.Screen name="mediaLibrary" />  
+          <Stack.Screen name="mediaLibraryP" /> 
+          <Stack.Screen name="albumP" />       
           <Stack.Screen name="+not-found" />
         </Stack>
       </ThemeProvider>
