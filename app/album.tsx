@@ -4,6 +4,7 @@ import { View, Text, FlatList, TouchableOpacity, Modal, TextInput, Button, Style
 import Ionicons from '@expo/vector-icons/Ionicons';
 import * as ImagePicker from 'expo-image-picker';
 import { Link } from 'expo-router';
+import * as FileSystem from 'expo-file-system';
 
 interface Album {
   id: number;
@@ -85,6 +86,52 @@ export default function Album() {
             const byteArray = new Uint8Array(byteNumbers);
 
             blob = new Blob([byteArray], { type: mime });
+          }
+        } else {
+          const fileUri = selectedImage;
+          const fileInfo = await FileSystem.getInfoAsync(fileUri);
+          if (fileInfo.exists) {
+            const formData = new FormData();
+            formData.append('image', {
+              uri: fileUri,
+              name: 'image.jpeg',
+              type: 'image/jpeg',
+            } as any);
+
+            const insertImageResponse = await axios.post('http://192.168.1.109:3000/api/upload/image/avelarmanuel', formData, {
+              headers: {
+                'Content-Type': 'multipart/form-data',
+              },
+            });
+
+            if (insertImageResponse.data) {
+              const imageData = insertImageResponse.data;
+              const album_ = {
+                nome: newAlbum.nome,
+                artistaId: newAlbum.artistaId,
+                imageId: imageData.id,
+              };
+
+              const insertAlbumResponse = await axios.post('http://192.168.1.109:3000/albuns', album_, {
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+              });
+
+              if (insertAlbumResponse.data) {
+                alert('Álbum adicionado com sucesso!');
+                setNewAlbum({ nome: '', artistaId: null, imageId: null });
+                setSelectedImage(null);
+                setIsModalVisible(false);
+                fetchAlbums();
+              } else {
+                alert('Erro ao adicionar álbum.');
+              }
+            } else {
+              alert(`Erro ao inserir imagem na base de dados: ${insertImageResponse.data.error}`);
+            }
+          } else {
+            console.error('Upload failed');
           }
         }
 
@@ -197,22 +244,15 @@ export default function Album() {
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>Adicionar Novo Álbum</Text>
+            <TouchableOpacity onPress={pickImage} style={styles.selectImageButton}>
+              <Text style={styles.selectImageText}>Selecionar Imagem</Text>
+            </TouchableOpacity>
             <TextInput
               style={styles.input}
               placeholder="Nome"
               value={newAlbum.nome}
               onChangeText={(text) => setNewAlbum({ ...newAlbum, nome: text })}
             />            
-            <TouchableOpacity onPress={pickImage} style={styles.selectImageButton}>
-              <Text style={styles.selectImageText}>Selecionar Imagem</Text>
-            </TouchableOpacity>
-            <TextInput
-              style={styles.input}
-              placeholder="ID do Artista"
-              value={newAlbum.artistaId ? newAlbum.artistaId.toString() : ''}
-              onChangeText={(text) => setNewAlbum({ ...newAlbum, artistaId: parseInt(text) || null })}
-              keyboardType="numeric"
-            />
             {selectedImage && <Image source={{ uri: selectedImage }} style={styles.selectedImage} />}
             <View style={styles.buttonContainer}>
               <Button title="Adicionar" onPress={addAlbum} color="#219ebc" />

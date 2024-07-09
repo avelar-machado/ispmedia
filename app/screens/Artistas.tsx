@@ -4,6 +4,7 @@ import { View, Text, FlatList, TouchableOpacity, Modal, TextInput, Button, Style
 import Ionicons from '@expo/vector-icons/Ionicons';
 import * as ImagePicker from 'expo-image-picker';
 import { Link } from 'expo-router';
+import * as FileSystem from 'expo-file-system';
 
 interface Artist {
   id: number;
@@ -57,7 +58,7 @@ export default function Artist() {
         let filename: string | undefined;
         let type: string | undefined;
         let blob: Blob | undefined;
-  
+
         if (uri.startsWith("data:image")) {
           // Handle base64 image data
           const base64 = uri.split(",")[1];
@@ -78,6 +79,71 @@ export default function Artist() {
   
             // Convert byte array to blob
             blob = new Blob([byteArray], { type: mime });
+          }
+        } else {
+          const fileUri = selectedImage;
+          const fileInfo = await FileSystem.getInfoAsync(fileUri);
+          if (fileInfo.exists) {
+            const formData = new FormData();
+            formData.append('image', {
+              uri: fileUri,
+              name: 'image.jpeg',
+              type: 'image/jpeg',
+            } as any);
+
+            const uploadResponse = await axios.post('http://192.168.1.109:3000/api/upload/image/avelarmanuel', formData, {
+              headers: {
+                'Content-Type': 'multipart/form-data',
+              },
+            });
+
+            if (uploadResponse.status === 200) {
+              const data = uploadResponse.data;
+              const imagem_ = {
+                user_Id: 1,
+                url: data.path,
+                descricao: '',
+                nome_ficheiro: data.filename,
+                extensao: data.mimetype,
+              };
+  
+              const insertResponse = await axios.post('http://192.168.1.109:3000/images', imagem_, {
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+              });
+  
+              if (insertResponse.data) {
+                try {
+                  const data = insertResponse.data;
+                  const artista_ = {
+                    nome: newArtist.nome,
+                    imageId: data.id,
+                  };
+          
+                  await axios.post('http://192.168.1.109:3000/artistas', artista_, {
+                    headers: {
+                      'Content-Type': 'application/json',
+                    },
+                  });
+                  alert('Artista adicionado com Sucesso!');
+                  console.log('Artista adicionado com Sucesso!');
+                  setNewArtist({ nome: '' });
+                  setSelectedImage(null);
+                  setIsModalVisible(false);
+                  fetchArtistas();
+                } catch (error) {
+                  console.error('Erro ao adicionar artista:', error);
+                }
+              } else {
+                alert(`Erro ao inserir imagem na base de dados: ${insertResponse.data.error}`);
+              }
+  
+              console.log('Upload successful');
+            } else {
+              console.error('Upload failed');
+            }
+
           }
         }
   
