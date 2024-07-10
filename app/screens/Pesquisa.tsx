@@ -50,10 +50,10 @@ const SearchComponent: React.FC = () => {
       setIsLoading(true);
       try {
         const [albumsResponse, artistsResponse, imagesResponse, usersResponse] = await Promise.all([
-          axios.get<Album[]>('https://192.168.1.109:3000/admin/albuns'),
-          axios.get<Artista[]>('https://192.168.1.109:3000/artistas'),
-          axios.get<Imagem[]>('https://192.168.1.109:3000/images'),
-          axios.get<User[]>('https://192.168.1.109:3000/users')
+          axios.get<Album[]>('https://192.168.1.183:3000/admin/albuns'),
+          axios.get<Artista[]>('https://192.168.1.183:3000/artistas'),
+          axios.get<Imagem[]>('https://192.168.1.183:3000/images'),
+          axios.get<User[]>('https://192.168.1.183:3000/users')
         ]);
         setAlbums(albumsResponse.data);
         setArtists(artistsResponse.data);
@@ -94,7 +94,7 @@ const SearchComponent: React.FC = () => {
   const getImageUrl = (imageId: number | null) => {
     const image = images.find(img => img.id === imageId);
     const nameUser = users.find(user => user.id === image?.user_Id);
-    return image ? `https://192.168.1.109:3000/upload/image/${nameUser?.username}/${image.nome_ficheiro}` : 'https://192.168.1.109:3000/upload/image/avelarmanuel/default.jpg';
+    return image ? `https://192.168.1.183:3000/upload/image/${nameUser?.username}/${image.nome_ficheiro}` : 'https://192.168.1.183:3000/upload/image/avelarmanuel/default.jpg';
   };
 
   return (

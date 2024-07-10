@@ -16,30 +16,30 @@ export default function App() {
 
   const videos = [
     {
-      uri: 'https://192.168.1.109:3000/upload/video/avelarmanuel/1720605569379-6Lack - Love.mp4',
+      uri: 'https://192.168.1.183:3000/upload/video/admin/1720622844193-.mp4',
       caption: '6Lack - Love'
     },
     {
-      uri: 'https://192.168.1.109:3000/upload/video/avelarmanuel/1720605753875-Coldplay - Family.mp4',
+      uri: 'https://192.168.1.183:3000/upload/video/admin/1720622844193-.mp4',
       caption: 'Coldplay - Family'
     },
     {
-      uri: 'https://192.168.1.109:3000/upload/video/avelarmanuel/1720606164610-Bunny - funny.mp4',
+      uri: 'https://192.168.1.183:3000/upload/video/admin/1720622844193-.mp4',
       caption: 'Bunny - funny'
     }
   ];
 
   const musicas = [
     {
-      uri: 'https://192.168.1.109:3000/upload/music/avelarmanuel/1720600390519-Gabi - Deus.mp4',
+      uri: 'https://192.168.1.183:3000/upload/music/admin/1720623998234-Musica.mp4',
       title: 'Gabi - Deus'
     },
     {
-      uri: 'https://192.168.1.109:3000/upload/music/avelarmanuel/1720606222305-PH - Sonhe.mp4',
+      uri: 'https://192.168.1.183:3000/upload/music/admin/1720623998234-Musica.mp4',
       title: 'GosPH - Sonhepel'
     },
     {
-      uri: 'https://192.168.1.109:3000/upload/music/avelarmanuel/1720606264348-Gabiela - Ame.mp4',
+      uri: 'https://192.168.1.183:3000/upload/music/admin/1720623998234-Musica.mp4',
       title: 'Gabiela - Ame'
     }
   ];

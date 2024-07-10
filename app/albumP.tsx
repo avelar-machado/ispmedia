@@ -39,7 +39,7 @@ export default function Album() {
 
   const fetchAlbums = async () => {
     try {
-      const response = await axios.get<Album[]>('http://192.168.1.109:3000/admin/albuns');
+      const response = await axios.get<Album[]>('http://192.168.1.183:3000/admin/albuns');
       setAlbums(response.data);
     } catch (error) {
       console.error('Error fetching albums:', error);
@@ -48,7 +48,7 @@ export default function Album() {
 
   const fetchImagens = async () => {
     try {
-      const response = await axios.get<Imagem[]>('http://192.168.1.109:3000/images');
+      const response = await axios.get<Imagem[]>('http://192.168.1.183:3000/images');
       setImages(response.data);
     } catch (error) {
       console.error('Error fetching images:', error);
@@ -68,8 +68,8 @@ export default function Album() {
               <Image
                 source={{
                   uri: images.find(img => img.id === item.imageId)
-                    ? `http://192.168.1.109:3000/upload/image/avelarmanuel/${images.find(img => img.id === item.imageId)?.nome_ficheiro}`
-                    : `http://192.168.1.109:3000/upload/image/avelarmanuel/1719310871715-ispmedia.jpeg`
+                    ? `http://192.168.1.183:3000/upload/image/avelarmanuel/${images.find(img => img.id === item.imageId)?.nome_ficheiro}`
+                    : `http://192.168.1.183:3000/upload/image/avelarmanuel/1719310871715-ispmedia.jpeg`
                 }}
                 style={styles.image}
               />

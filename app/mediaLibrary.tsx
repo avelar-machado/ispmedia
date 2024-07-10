@@ -81,7 +81,7 @@ export default function Media() {
 
   const fetchVideos = async () => {
     try {
-      const response = await axios.get<VideoType[]>('https://192.168.1.109:3000/videos');
+      const response = await axios.get<VideoType[]>('https://192.168.1.183:3000/videos');
       setVideos(response.data);
     } catch (error) {
       console.error('Error fetching videos:', error);
@@ -90,7 +90,7 @@ export default function Media() {
 
   const fetchMusicas = async () => {
     try {
-      const response = await axios.get<AudioType[]>('https://192.168.1.109:3000/musics');
+      const response = await axios.get<AudioType[]>('https://192.168.1.183:3000/musics');
       setMusicas(response.data);
       setAudioRefs(response.data.map(() => createRef<Video | null>()));
       setIsPlaying(new Array(response.data.length).fill(false));
@@ -116,7 +116,7 @@ export default function Media() {
                     type: 'video/mp4',
                 } as any);
 
-                const uploadResponse = await axios.post(`https://192.168.1.109:3000/upload/video/${username}`, formData, {
+                const uploadResponse = await axios.post(`https://192.168.1.183:3000/upload/video/${username}`, formData, {
                     headers: {
                     'Content-Type': 'multipart/form-data',
                     },
@@ -134,7 +134,7 @@ export default function Media() {
                     extensao: data.mimetype,
                     };
 
-                    await axios.post('https://192.168.1.109:3000/videos', video_, {
+                    await axios.post('https://192.168.1.183:3000/videos', video_, {
                     headers: {
                         'Content-Type': 'application/json',
                     },
@@ -159,7 +159,7 @@ export default function Media() {
             formData.append('video', blob, newVideo.descricao+'.mp4');
             alert("Aqui 2 : " + username);
     
-            const uploadResponse = await axios.post(`https://192.168.1.109:3000/upload/video/${username}`, formData, {
+            const uploadResponse = await axios.post(`https://192.168.1.183:3000/upload/video/${username}`, formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 },
@@ -178,7 +178,7 @@ export default function Media() {
                   extensao: data.mimetype,
                 };
     
-                await axios.post('https://192.168.1.109:3000/videos', video_, {
+                await axios.post('https://192.168.1.183:3000/videos', video_, {
                   headers: {
                     'Content-Type': 'application/json',
                   },
@@ -216,7 +216,7 @@ export default function Media() {
                 type: 'music/mp3',
             } as any);
             
-            const uploadResponse = await axios.post(`https://192.168.1.109:3000/upload/music/${username}`, formData, {
+            const uploadResponse = await axios.post(`https://192.168.1.183:3000/upload/music/${username}`, formData, {
                 headers: {
                 'Content-Type': 'multipart/form-data',
                 },
@@ -237,7 +237,7 @@ export default function Media() {
                     "estado": true,
                 };
 
-                const musicInsertResponse = await axios.post('https://192.168.1.109:3000/musics', music_, {
+                const musicInsertResponse = await axios.post('https://192.168.1.183:3000/musics', music_, {
                     headers: {
                     'Content-Type': 'application/json',
                     },
@@ -281,7 +281,7 @@ export default function Media() {
             const formData = new FormData();
             formData.append('music', blob, newMusic.titulo+'.mp4');
     
-            const uploadResponse = await axios.post(`https://192.168.1.109:3000/upload/music/${username}`, formData, {
+            const uploadResponse = await axios.post(`https://192.168.1.183:3000/upload/music/${username}`, formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 },
@@ -302,7 +302,7 @@ export default function Media() {
                     "estado": true,
                 };
 
-                const musicInsertResponse = await axios.post('https://192.168.1.109:3000/musics', music_, {
+                const musicInsertResponse = await axios.post('https://192.168.1.183:3000/musics', music_, {
                     headers: {
                     'Content-Type': 'application/json',
                     },
@@ -452,7 +452,7 @@ export default function Media() {
             <Video
               ref={audioRefs[index]}
               style={styles.video}
-              source={{ uri: `https://192.168.1.109:3000/upload/video/${username}/${video.nome_ficheiro}` }}
+              source={{ uri: `https://192.168.1.183:3000/upload/video/${username}/${video.nome_ficheiro}` }}
               useNativeControls
               resizeMode={ResizeMode.CONTAIN}
               isLooping
@@ -510,7 +510,7 @@ export default function Media() {
               onPress={() =>
                 playPauseAudio(
                   index,
-                  `https://192.168.1.109:3000/upload/music/${username}/${music.nome_ficheiro}`
+                  `https://192.168.1.183:3000/upload/music/${username}/${music.nome_ficheiro}`
                 )
               }
               style={{ marginRight: 10 }}
@@ -523,37 +523,51 @@ export default function Media() {
         ))}
       </View>
 
-      {/* Modal para adicionar vídeo */}
-      <Modal visible={isVideoModalVisible} animationType="slide">
-        <View style={styles.modalContainer}>
-          <Text style={styles.modalTitle}>Adicionar Novo Vídeo</Text>
-          <TouchableOpacity style={styles.modalButton} onPress={pickVideo}>
-            <Text style={styles.modalButtonText}>Escolher Vídeo</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.modalButton} onPress={addVideo}>
-            <Text style={styles.modalButtonText}>Adicionar Vídeo</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.modalButton} onPress={() => setIsVideoModalVisible(false)}>
-            <Text style={styles.modalButtonText}>Cancelar</Text>
-          </TouchableOpacity>
-        </View>
-      </Modal>
+      <Modal visible={isVideoModalVisible} transparent={true} animationType="slide">
+          <View style={styles.modalContainer}>
+            <View style={styles.modalContent}>
+              <Text style={styles.modalTitle}>Adicionar Novo Vídeo</Text>              
+              <TouchableOpacity style={styles.selectImageButton} onPress={pickVideo}>
+                <Text style={styles.selectImageText}>Escolher Vídeo</Text>
+              </TouchableOpacity>
+              <TextInput
+                style={styles.input}
+                placeholder="Descrição"
+                value={newVideo.descricao}
+                onChangeText={text => setNewVideo({ ...newVideo, descricao: text })}
+              />
+              {selectedVideo && <Text style={styles.selectedFileName}>{selectedVideo.split('/').pop()}</Text>}
+              <View style={styles.buttonContainer}>
+                <Button title="Adicionar" onPress={addVideo} color={"#219ebc"} />
+                <Button title="Cancelar" onPress={() => setIsVideoModalVisible(false)} color={"#219ebc"} />
+              </View>
+            </View>
+          </View>
+        </Modal>
 
-      {/* Modal para adicionar música */}
-      <Modal visible={isMusicModalVisible} animationType="slide">
-        <View style={styles.modalContainer}>
-          <Text style={styles.modalTitle}>Adicionar Nova Música</Text>
-          <TouchableOpacity style={styles.modalButton} onPress={pickMusic}>
-            <Text style={styles.modalButtonText}>Escolher Música</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.modalButton} onPress={addMusic}>
-            <Text style={styles.modalButtonText}>Adicionar Música</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.modalButton} onPress={() => setIsMusicModalVisible(false)}>
-            <Text style={styles.modalButtonText}>Cancelar</Text>
-          </TouchableOpacity>
-        </View>
-      </Modal>
+       {/* Modal para adicionar músicas */}
+       <Modal visible={isMusicModalVisible} transparent={true} animationType="slide">
+          <View style={styles.modalContainer}>
+            <View style={styles.modalContent}>
+              <Text style={styles.modalTitle}>Adicionar Nova Música</Text>
+              <TouchableOpacity style={styles.selectImageButton} onPress={pickMusic}>
+                <Text style={styles.selectImageText}>Escolher Música</Text>
+              </TouchableOpacity>
+              <TextInput
+                style={styles.input}
+                placeholder="Título"
+                value={newMusic.titulo}
+                onChangeText={text => setNewMusic({ ...newMusic, titulo: text })}
+              />
+              {selectedMusic && <Text style={styles.selectedFileName}>{selectedMusic.split('/').pop()}</Text>}
+              <View style={styles.buttonContainer}>
+                <Button title="Adicionar" onPress={addMusic} color={"#219ebc"} />
+                <Button title="Cancelar" onPress={() => setIsMusicModalVisible(false)} color={"#219ebc"} />
+              </View>
+            </View>
+          </View>
+        </Modal>
+
     </ScrollView>
   );
 }
@@ -571,6 +585,7 @@ const styles = StyleSheet.create({
   buttonContainer: {
     flexDirection: 'row',
     marginBottom: 20,
+    justifyContent: 'space-around',
   },
   button: {
     marginHorizontal: 10,
@@ -654,5 +669,38 @@ const styles = StyleSheet.create({
   modalButtonText: {
     color: 'white',
     fontWeight: 'bold',
+  },
+  modalContent: {
+    width: '50%',
+    padding: 20,
+    backgroundColor: 'white',
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+  input: {
+    width: '100%',
+    height: 40,
+    borderColor: 'gray',
+    borderWidth: 1,
+    borderRadius: 5,
+    marginBottom: 15,
+    paddingHorizontal: 10,
+  },
+  selectImageButton: {
+    backgroundColor: '#219ebc',
+    padding: 10,
+    borderRadius: 5,
+    marginBottom: 15,
+    width: '100%',
+    alignItems: 'center',
+  },
+  selectImageText: {
+    color: 'white',
+    textAlign: 'center',
+  },
+  selectedFileName: {
+    fontSize: 16,
+    color: 'gray',
+    marginBottom: 15,
   },
 });

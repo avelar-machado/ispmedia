@@ -46,7 +46,7 @@ export default function Album() {
 
   const fetchAlbums = async () => {
     try {
-      const response = await axios.get<Album[]>('https://192.168.1.109:3000/admin/albuns');
+      const response = await axios.get<Album[]>('https://192.168.1.183:3000/admin/albuns');
       const allAlbums = response.data;
 
       // Convert idArtist to number
@@ -63,7 +63,7 @@ export default function Album() {
 
   const fetchImagens = async () => {
     try {
-      const response = await axios.get<Imagem[]>('https://192.168.1.109:3000/images');
+      const response = await axios.get<Imagem[]>('https://192.168.1.183:3000/images');
       setImages(response.data);
     } catch (error) {
       console.error('Error fetching images:', error);
@@ -108,7 +108,7 @@ export default function Album() {
               type: 'image/jpeg',
             } as any);
 
-            const insertImageResponse = await axios.post(`https://192.168.1.109:3000/api/upload/image/${username}`, formData, {
+            const insertImageResponse = await axios.post(`https://192.168.1.183:3000/api/upload/image/${username}`, formData, {
               headers: {
                 'Content-Type': 'multipart/form-data',
               },
@@ -122,7 +122,7 @@ export default function Album() {
                 imageId: imageData.id,
               };
 
-              const insertAlbumResponse = await axios.post('https://192.168.1.109:3000/albuns', album_, {
+              const insertAlbumResponse = await axios.post('https://192.168.1.183:3000/albuns', album_, {
                 headers: {
                   'Content-Type': 'application/json',
                 },
@@ -148,7 +148,7 @@ export default function Album() {
         if (filename && blob && type) {
           const formData = new FormData();
           formData.append('image', blob, filename);
-          const uploadResponse = await axios.post(`https://192.168.1.109:3000/upload/image/${username}`, formData, {
+          const uploadResponse = await axios.post(`https://192.168.1.183:3000/upload/image/${username}`, formData, {
             headers: {
               'Content-Type': 'multipart/form-data',
             },
@@ -164,7 +164,7 @@ export default function Album() {
               extensao: data.mimetype,
             };
 
-            const insertImageResponse = await axios.post('https://192.168.1.109:3000/images', image_, {
+            const insertImageResponse = await axios.post('https://192.168.1.183:3000/images', image_, {
               headers: {
                 'Content-Type': 'application/json',
               },
@@ -178,7 +178,7 @@ export default function Album() {
                 imageId: imageData.id,
               };
 
-              const insertAlbumResponse = await axios.post('https://192.168.1.109:3000/albuns', album_, {
+              const insertAlbumResponse = await axios.post('https://192.168.1.183:3000/albuns', album_, {
                 headers: {
                   'Content-Type': 'application/json',
                 },
@@ -235,8 +235,8 @@ export default function Album() {
               <Image
                 source={{
                   uri: images.find(img => img.id === item.imageId)
-                    ? `https://192.168.1.109:3000/upload/image/${username}/${images.find(img => img.id === item.imageId)?.nome_ficheiro}`
-                    : `https://192.168.1.109:3000/upload/image/avelarmanuel/1719310871715-ispmedia.jpeg`
+                    ? `https://192.168.1.183:3000/upload/image/${username}/${images.find(img => img.id === item.imageId)?.nome_ficheiro}`
+                    : `https://192.168.1.183:3000/upload/image/avelarmanuel/1719310871715-ispmedia.jpeg`
                 }}
                 style={styles.image}
               />

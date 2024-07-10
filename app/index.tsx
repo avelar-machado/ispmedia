@@ -24,13 +24,13 @@ const LoginScreen = () => {
     }
 
     try {
-      const res = await axios.post("https://192.168.1.109:3000/users/login", {
+      const res = await axios.post("https://192.168.1.183:3000/users/login", {
         username,
         password,
       });
       login(res.data.token);
       code = res.data.id;
-      alert("Bem-vindo(a) ao ISPMEDIA " + res.data.editor);
+      alert("Bem-vindo(a) ao ISPMEDIA " + res.data.username);
       setError(''); // Limpa qualquer erro anterior após o sucesso
       if (res.data.editor) {
       router.push({

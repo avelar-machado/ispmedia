@@ -53,7 +53,7 @@ export default function Media() {
 
   const fetchVideos = async () => {
     try {
-      const response = await axios.get<VideoType[]>('http://192.168.1.109:3000/videos');
+      const response = await axios.get<VideoType[]>('http://192.168.1.183:3000/videos');
       setVideos(response.data);
     } catch (error) {
       console.error('Error fetching videos:', error);
@@ -62,7 +62,7 @@ export default function Media() {
 
   const fetchMusicas = async () => {
     try {
-      const response = await axios.get<AudioType[]>('http://192.168.1.109:3000/musics');
+      const response = await axios.get<AudioType[]>('http://192.168.1.183:3000/musics');
       setMusicas(response.data);
       setAudioRefs(response.data.map(() => createRef<Video | null>()));
       setIsPlaying(new Array(response.data.length).fill(false));
@@ -134,7 +134,7 @@ export default function Media() {
             <Video
                 ref={audioRefs[index]}
                 style={styles.video}
-                source={{ uri: `http://192.168.1.109:3000/api/upload/video/avelarmanuel/${video.nome_ficheiro}` }}
+                source={{ uri: `http://192.168.1.183:3000/api/upload/video/avelarmanuel/${video.nome_ficheiro}` }}
                 useNativeControls
                 resizeMode={ResizeMode.CONTAIN}
                 isLooping
@@ -177,7 +177,7 @@ export default function Media() {
               name={isPlaying[index] ? 'pause' : 'play'}
               size={24}
               color="black"
-              onPress={() => playPauseAudio(index, `http://192.168.1.109:3000/api/upload/music/avelarmanuel/${music.nome_ficheiro}`)}
+              onPress={() => playPauseAudio(index, `http://192.168.1.183:3000/api/upload/music/avelarmanuel/${music.nome_ficheiro}`)}
             />
           </View>
         ))}
