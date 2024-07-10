@@ -24,18 +24,25 @@ const LoginScreen = () => {
     }
 
     try {
-      const res = await axios.post("http://192.168.1.109:3000/users/login", {
+      const res = await axios.post("https://192.168.1.109:3000/users/login", {
         username,
         password,
       });
       login(res.data.token);
       code = res.data.id;
-      alert("Bem-vindo(a) ao ISPMEDIA " + res.data.username);
+      alert("Bem-vindo(a) ao ISPMEDIA " + res.data.editor);
       setError(''); // Limpa qualquer erro anterior após o sucesso
+      if (res.data.editor) {
       router.push({
         pathname: '/screens',
         params: { username, code },
       });
+      } else {
+        router.push({
+          pathname: '/screensU',
+          params: { username, code },
+        });
+      }
     } catch (err) {
       setError("Erro ao fazer login. Tente novamente.");
     }

@@ -42,20 +42,28 @@ export default function Album() {
   useEffect(() => {
     fetchAlbums();
     fetchImagens();
-  }, []);
+  }, [newAlbum]);
 
   const fetchAlbums = async () => {
     try {
-      const response = await axios.get<Album[]>('http://192.168.1.109:3000/admin/albuns');
-      setAlbums(response.data);
+      const response = await axios.get<Album[]>('https://192.168.1.109:3000/admin/albuns');
+      const allAlbums = response.data;
+
+      // Convert idArtist to number
+      const artistIdNumber = typeof idArtist === 'string' ? parseInt(idArtist, 10) : idArtist;
+      
+      // Filter albums based on artistId
+      const filteredAlbums = allAlbums.filter(album => album.artistaId === artistIdNumber);
+      setAlbums(filteredAlbums);
     } catch (error) {
       console.error('Error fetching albums:', error);
     }
   };
+  
 
   const fetchImagens = async () => {
     try {
-      const response = await axios.get<Imagem[]>('http://192.168.1.109:3000/images');
+      const response = await axios.get<Imagem[]>('https://192.168.1.109:3000/images');
       setImages(response.data);
     } catch (error) {
       console.error('Error fetching images:', error);
@@ -63,6 +71,7 @@ export default function Album() {
   };
 
   const addAlbum = async () => {
+    
     try {
       if (selectedImage) {
         let uri: string = selectedImage;
@@ -99,7 +108,7 @@ export default function Album() {
               type: 'image/jpeg',
             } as any);
 
-            const insertImageResponse = await axios.post(`http://192.168.1.109:3000/api/upload/image/${username}`, formData, {
+            const insertImageResponse = await axios.post(`https://192.168.1.109:3000/api/upload/image/${username}`, formData, {
               headers: {
                 'Content-Type': 'multipart/form-data',
               },
@@ -113,7 +122,7 @@ export default function Album() {
                 imageId: imageData.id,
               };
 
-              const insertAlbumResponse = await axios.post('http://192.168.1.109:3000/albuns', album_, {
+              const insertAlbumResponse = await axios.post('https://192.168.1.109:3000/albuns', album_, {
                 headers: {
                   'Content-Type': 'application/json',
                 },
@@ -139,8 +148,7 @@ export default function Album() {
         if (filename && blob && type) {
           const formData = new FormData();
           formData.append('image', blob, filename);
-
-          const uploadResponse = await axios.post(`http://192.168.1.109:3000/api/upload/image/${username}`, formData, {
+          const uploadResponse = await axios.post(`https://192.168.1.109:3000/upload/image/${username}`, formData, {
             headers: {
               'Content-Type': 'multipart/form-data',
             },
@@ -156,7 +164,7 @@ export default function Album() {
               extensao: data.mimetype,
             };
 
-            const insertImageResponse = await axios.post('http://192.168.1.109:3000/images', image_, {
+            const insertImageResponse = await axios.post('https://192.168.1.109:3000/images', image_, {
               headers: {
                 'Content-Type': 'application/json',
               },
@@ -170,7 +178,7 @@ export default function Album() {
                 imageId: imageData.id,
               };
 
-              const insertAlbumResponse = await axios.post('http://192.168.1.109:3000/albuns', album_, {
+              const insertAlbumResponse = await axios.post('https://192.168.1.109:3000/albuns', album_, {
                 headers: {
                   'Content-Type': 'application/json',
                 },
@@ -217,18 +225,18 @@ export default function Album() {
 
   return (
     <View style={styles.container}>
-      <Text style = {styles.head} >ALBUNS</Text>
+      <Text style = {styles.head} >ALBUNS </Text>
       <FlatList
         data={albums}
         keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => (
           <View style={styles.albumContainer}>
-            <Link href={{ pathname: '/mediaLibrary' }}> 
+            <Link href={{ pathname: '/mediaLibrary', params: { username, code, idAlbum : item.id, idArtist : item.artistaId } }}> 
               <Image
                 source={{
                   uri: images.find(img => img.id === item.imageId)
-                    ? `http://192.168.1.109:3000/api/upload/image/${username}/${images.find(img => img.id === item.imageId)?.nome_ficheiro}`
-                    : `http://192.168.1.109:3000/api/upload/image/avelarmanuel/1719310871715-ispmedia.jpeg`
+                    ? `https://192.168.1.109:3000/upload/image/${username}/${images.find(img => img.id === item.imageId)?.nome_ficheiro}`
+                    : `https://192.168.1.109:3000/upload/image/avelarmanuel/1719310871715-ispmedia.jpeg`
                 }}
                 style={styles.image}
               />

@@ -68,8 +68,8 @@ export default function Album() {
               <Image
                 source={{
                   uri: images.find(img => img.id === item.imageId)
-                    ? `http://192.168.1.109:3000/api/upload/image/avelarmanuel/${images.find(img => img.id === item.imageId)?.nome_ficheiro}`
-                    : `http://192.168.1.109:3000/api/upload/image/avelarmanuel/1719310871715-ispmedia.jpeg`
+                    ? `http://192.168.1.109:3000/upload/image/avelarmanuel/${images.find(img => img.id === item.imageId)?.nome_ficheiro}`
+                    : `http://192.168.1.109:3000/upload/image/avelarmanuel/1719310871715-ispmedia.jpeg`
                 }}
                 style={styles.image}
               />

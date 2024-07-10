@@ -10,6 +10,7 @@ interface Artist {
   id: number;
   nome: string;
   imageId: number | null;
+  userId: number | null;
 }
 
 interface Imagem {
@@ -25,19 +26,26 @@ export default function Artist() {
   const [artistas, setArtistas] = useState<Artist[]>([]);
   const [images, setImages] = useState<Imagem[]>([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [newArtist, setNewArtist] = useState<Omit<Artist, 'id' | 'imageId'>>({ nome: '' });
+  const [newArtist, setNewArtist] = useState<Omit<Artist, 'id' | 'imageId' | 'userId'>>({ nome: '' });
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const { username, code } = useLocalSearchParams(); 
 
   useEffect(() => {
     fetchArtistas();
     fetchImagens();
-  }, []);
+  }, [newArtist]);
 
   const fetchArtistas = async () => {
     try {
-      const response = await axios.get<Artist[]>('http://192.168.1.109:3000/artistas');
-      setArtistas(response.data);
+      const response = await axios.get<Artist[]>('https://192.168.1.109:3000/artistas');
+      const allArtistas = response.data;
+
+      // Convert idArtist to number
+      const userIdNumber = typeof code === 'string' ? parseInt(code, 10) : code;
+      
+      // Filter albums based on artistId
+      const filteredArtistas = allArtistas.filter(artista => artista.userId === userIdNumber);
+      setArtistas(filteredArtistas);
     } catch (error) {
       console.error('Error fetching artists:', error);
     }
@@ -45,7 +53,7 @@ export default function Artist() {
 
   const fetchImagens = async () => {
     try {
-      const response = await axios.get<Imagem[]>('http://192.168.1.109:3000/images');
+      const response = await axios.get<Imagem[]>('https://192.168.1.109:3000/images');
       setImages(response.data);
     } catch (error) {
       console.error('Error fetching images:', error);
@@ -92,7 +100,7 @@ export default function Artist() {
               type: 'image/jpeg',
             } as any);
 
-            const uploadResponse = await axios.post(`http://192.168.1.109:3000/api/upload/image/${username}`, formData, {
+            const uploadResponse = await axios.post(`https://192.168.1.109:3000/upload/image/${username}`, formData, {
               headers: {
                 'Content-Type': 'multipart/form-data',
               },
@@ -108,7 +116,7 @@ export default function Artist() {
                 extensao: data.mimetype,
               };
   
-              const insertResponse = await axios.post('http://192.168.1.109:3000/images', imagem_, {
+              const insertResponse = await axios.post('https://192.168.1.109:3000/images', imagem_, {
                 headers: {
                   'Content-Type': 'application/json',
                 },
@@ -120,9 +128,10 @@ export default function Artist() {
                   const artista_ = {
                     nome: newArtist.nome,
                     imageId: data.id,
+                    userId: code,
                   };
           
-                  await axios.post('http://192.168.1.109:3000/artistas', artista_, {
+                  await axios.post('https://192.168.1.109:3000/artistas', artista_, {
                     headers: {
                       'Content-Type': 'application/json',
                     },
@@ -152,7 +161,7 @@ export default function Artist() {
           const formData = new FormData();
           formData.append('image', blob, filename);
   
-          const uploadResponse = await axios.post(`http://192.168.1.109:3000/api/upload/image/${username}`, formData, {
+          const uploadResponse = await axios.post(`https://192.168.1.109:3000/upload/image/${username}`, formData, {
             headers: {
               'Content-Type': 'multipart/form-data',
             },
@@ -168,7 +177,7 @@ export default function Artist() {
               extensao: data.mimetype,
             };
 
-            const insertResponse = await axios.post('http://192.168.1.109:3000/images', imagem_, {
+            const insertResponse = await axios.post('https://192.168.1.109:3000/images', imagem_, {
               headers: {
                 'Content-Type': 'application/json',
               },
@@ -180,9 +189,10 @@ export default function Artist() {
                 const artista_ = {
                   nome: newArtist.nome,
                   imageId: data.id,
+                  userId: code,
                 };
         
-                await axios.post('http://192.168.1.109:3000/artistas', artista_, {
+                await axios.post('https://192.168.1.109:3000/artistas', artista_, {
                   headers: {
                     'Content-Type': 'application/json',
                   },
@@ -239,8 +249,8 @@ export default function Artist() {
               <Image
                 source={{
                   uri: images.find(img => img.id === item.imageId) 
-                    ? `http://192.168.1.109:3000/api/upload/image/${username}/${images.find(img => img.id === item.imageId)?.nome_ficheiro}`
-                    : `http://192.168.1.109:3000/api/upload/image/avelarmanuel/1719273293937-img1.jpg`
+                    ? `https://192.168.1.109:3000/upload/image/${username}/${images.find(img => img.id === item.imageId)?.nome_ficheiro}`
+                    : `https://192.168.1.109:3000/upload/image/avelarmanuel/1719273293937-img1.jpg`
                 }}
                 style={styles.image}
               />

@@ -32,16 +32,6 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="Artistas"
-        initialParams={{ username, code }}
-        options={{
-          title: 'Teus Artistas',
-          tabBarIcon: ({ color, focused }) => (
-            <TabBarIcon name={focused ? 'people' : 'people-outline'} color={color} />
-          ),
-        }}
-      />
-      <Tabs.Screen
         name="Radios"
         initialParams={{ username, code }}
         options={{

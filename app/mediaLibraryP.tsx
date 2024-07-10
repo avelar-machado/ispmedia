@@ -225,8 +225,8 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   video: {
-    width: Platform.OS === 'web' ? 700 : '100%',
-    height: Platform.OS === 'web' ? 390 : 250,
+    width: Platform.OS === 'web' ? 1300 : '100%',
+    height: Platform.OS === 'web' ? 720 : 250,
   },
   description: {
     fontSize: 16,
